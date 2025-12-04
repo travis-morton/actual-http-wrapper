@@ -1,6 +1,6 @@
 [project]
 name = "actual-http-wrapper"
-version = "0.1.0"
+version = "0.2.0"
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -8,10 +8,17 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-    "httpx>=0.28.1",
     "pydantic>=2.12.5",
+    "requests>=2.32.5",
 ]
 
 [build-system]
 requires = ["uv_build>=0.9.15,<0.10.0"]
 build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.1",
+    "requests-mock>=1.12.1",
+    "types-requests>=2.32.4.20250913",
+]
