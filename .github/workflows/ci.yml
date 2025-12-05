@@ -1,0 +1,64 @@
+name: CI
+
+env:
+  DOCKER_BUILDKIT: 1
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+  push:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.13"
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Run pre-commit
+        uses: pre-commit/action@v3.0.1
+
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.9.13"
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Test with pytest
+        run:  uv run pytest --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
+          verbose: true
