@@ -1,11 +1,16 @@
 import datetime
+from decimal import Decimal
 from http import HTTPStatus
+from typing import TYPE_CHECKING
 
 from src.actual_http_wrapper.client import ActualAPI
 from src.actual_http_wrapper.models import Account, ExistingTransaction, Transaction
 
+if TYPE_CHECKING:
+    from requests_mock import Mocker
 
-def test_get_actual_accounts(requests_mock):
+
+def test_get_actual_accounts(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     account = {"id": "1", "name": "Checking", "offbudget": False, "closed": False}
     requests_mock.get(
@@ -16,7 +21,7 @@ def test_get_actual_accounts(requests_mock):
     assert actual_accounts == [Account(**account)]
 
 
-def test_get_actual_open_accounts(requests_mock):
+def test_get_actual_open_accounts(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     accounts = [
         {"id": "1", "name": "Checking", "offbudget": False, "closed": False},
@@ -33,17 +38,17 @@ def test_get_actual_open_accounts(requests_mock):
     assert open_accounts == expected_accounts
 
 
-def test_import_transactions_to_actual(requests_mock):
+def test_import_transactions_to_actual(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     transactions = [
         Transaction(
             account="1",
             amount=1000,
             payee_name="Test Payee",
-            date="2023-01-01",
+            date=datetime.date(2024, 1, 1),
             imported_id="txn1",
             cleared=True,
-        )
+        ),
     ]
     requests_mock.post(
         "http://example.com/budgets/123/accounts/1/transactions/import",
@@ -54,10 +59,12 @@ def test_import_transactions_to_actual(requests_mock):
 
     assert response.status_code == HTTPStatus.OK
     assert requests_mock.called
-    assert requests_mock.last_request.json() == {"transactions": [t.model_dump(mode="json") for t in transactions]}
+    assert requests_mock.last_request.json() == {  # pyright: ignore[reportOptionalMemberAccess]
+        "transactions": [t.model_dump(mode="json") for t in transactions],
+    }
 
 
-def test_get_transactions_for_account_success(requests_mock):
+def test_get_transactions_for_account_success(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     budget_id = "budget1"
     account_id = "acc1"
@@ -88,7 +95,12 @@ def test_get_transactions_for_account_success(requests_mock):
     ]
     requests_mock.get(url, json={"data": data})
 
-    result = actual_api.get_transactions_for_account(budget_id, account_id, since_date, until_date)
+    result = actual_api.get_transactions_for_account(
+        budget_id,
+        account_id,
+        since_date,
+        until_date,
+    )
 
     assert result == [
         ExistingTransaction(
@@ -114,7 +126,7 @@ def test_get_transactions_for_account_success(requests_mock):
     ]
 
 
-def test_get_payees_for_budget(requests_mock):
+def test_get_payees_for_budget(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     budget_id = "budget1"
     url = f"http://example.com/budgets/{budget_id}/payees"
@@ -127,3 +139,15 @@ def test_get_payees_for_budget(requests_mock):
     result = actual_api.get_payees_for_budget(budget_id)
 
     assert result == payees
+
+
+def test_get_account_balance(requests_mock: "Mocker"):
+    actual_api = ActualAPI("http://example.com", "key")
+    budget_id = "budget1"
+    account_id = "acc1"
+    url = f"http://example.com/budgets/{budget_id}/accounts/{account_id}/balance"
+    requests_mock.get(url, json={"data": 12345})
+
+    balance = actual_api.get_account_balance(budget_id, account_id)
+
+    assert balance == Decimal("123.45")
