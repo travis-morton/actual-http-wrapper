@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from requests_mock import Mocker
 
 
-def test_get_actual_accounts(requests_mock: Mocker):
+def test_get_actual_accounts(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     account = {"id": "1", "name": "Checking", "offbudget": False, "closed": False}
     requests_mock.get(
@@ -20,7 +20,7 @@ def test_get_actual_accounts(requests_mock: Mocker):
     assert actual_accounts == [Account(**account)]
 
 
-def test_get_actual_open_accounts(requests_mock: Mocker):
+def test_get_actual_open_accounts(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     accounts = [
         {"id": "1", "name": "Checking", "offbudget": False, "closed": False},
@@ -37,7 +37,7 @@ def test_get_actual_open_accounts(requests_mock: Mocker):
     assert open_accounts == expected_accounts
 
 
-def test_import_transactions_to_actual(requests_mock: Mocker):
+def test_import_transactions_to_actual(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     transactions = [
         Transaction(
@@ -63,7 +63,7 @@ def test_import_transactions_to_actual(requests_mock: Mocker):
     }
 
 
-def test_get_transactions_for_account_success(requests_mock: Mocker):
+def test_get_transactions_for_account_success(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     budget_id = "budget1"
     account_id = "acc1"
@@ -122,7 +122,7 @@ def test_get_transactions_for_account_success(requests_mock: Mocker):
     ]
 
 
-def test_get_payees_for_budget(requests_mock: Mocker):
+def test_get_payees_for_budget(requests_mock: "Mocker"):
     actual_api = ActualAPI("http://example.com", "key")
     budget_id = "budget1"
     url = f"http://example.com/budgets/{budget_id}/payees"
