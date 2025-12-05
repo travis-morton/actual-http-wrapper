@@ -59,7 +59,7 @@ def test_import_transactions_to_actual(requests_mock: "Mocker"):
 
     assert response.status_code == HTTPStatus.OK
     assert requests_mock.called
-    assert requests_mock.last_request.json() == { # pyright: ignore[reportOptionalMemberAccess]
+    assert requests_mock.last_request.json() == {  # pyright: ignore[reportOptionalMemberAccess]
         "transactions": [t.model_dump(mode="json") for t in transactions],
     }
 
