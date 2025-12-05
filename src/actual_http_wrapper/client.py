@@ -1,6 +1,6 @@
 
 import datetime
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 
 import requests
 
@@ -52,7 +52,7 @@ class ActualAPI:
         return [ExistingTransaction(**transaction) for transaction in response.json()["data"]]
 
     def import_transactions_to_actual(
-        self, account_id: str, transactions: list[Transaction], budget_sync_id: str
+        self, account_id: str, transactions: list[Transaction], budget_sync_id: str,
     ) -> requests.Response:
         data = {"transactions": [t.model_dump(mode="json") for t in transactions]}
         url = f"{self.host}/budgets/{budget_sync_id}/accounts/{account_id}/transactions/import"

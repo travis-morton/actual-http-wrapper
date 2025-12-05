@@ -43,7 +43,7 @@ def test_import_transactions_to_actual(requests_mock):
             date="2023-01-01",
             imported_id="txn1",
             cleared=True,
-        )
+        ),
     ]
     requests_mock.post(
         "http://example.com/budgets/123/accounts/1/transactions/import",
