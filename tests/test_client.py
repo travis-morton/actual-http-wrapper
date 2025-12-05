@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 from http import HTTPStatus
 from typing import TYPE_CHECKING
 
@@ -138,3 +139,15 @@ def test_get_payees_for_budget(requests_mock: "Mocker"):
     result = actual_api.get_payees_for_budget(budget_id)
 
     assert result == payees
+
+
+def test_get_account_balance(requests_mock: "Mocker"):
+    actual_api = ActualAPI("http://example.com", "key")
+    budget_id = "budget1"
+    account_id = "acc1"
+    url = f"http://example.com/budgets/{budget_id}/accounts/{account_id}/balance"
+    requests_mock.get(url, json={"data": 12345})
+
+    balance = actual_api.get_account_balance(budget_id, account_id)
+
+    assert balance == Decimal("123.45")
