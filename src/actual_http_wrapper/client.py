@@ -1,5 +1,7 @@
 
 import datetime
+from decimal import Decimal, ROUND_HALF_UP
+
 import requests
 
 from .models import Account, ExistingTransaction, Transaction
@@ -16,6 +18,13 @@ class ActualAPI:
         r = self.session.get(url)
         r.raise_for_status()
         return [Account(**account) for account in r.json()["data"]]
+
+    def get_account_balance(self, budget_sync_id: str, account_id: str) -> Decimal:
+        url = f"{self.host}/budgets/{budget_sync_id}/accounts/{account_id}/balance"
+        r = self.session.get(url)
+        r.raise_for_status()
+        raw_balance = r.json()["data"]
+        return Decimal(raw_balance / 100).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     def get_actual_open_accounts(self, budget_sync_id: str) -> list[Account]:
         accounts = self.get_actual_accounts(budget_sync_id)
