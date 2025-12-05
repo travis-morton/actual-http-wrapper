@@ -44,7 +44,7 @@ def test_import_transactions_to_actual(requests_mock: "Mocker"):
             account="1",
             amount=1000,
             payee_name="Test Payee",
-            date="2023-01-01",
+            date=datetime.date(2024, 1, 1),
             imported_id="txn1",
             cleared=True,
         ),
@@ -58,7 +58,7 @@ def test_import_transactions_to_actual(requests_mock: "Mocker"):
 
     assert response.status_code == HTTPStatus.OK
     assert requests_mock.called
-    assert requests_mock.last_request.json() == {
+    assert requests_mock.last_request.json() == { # pyright: ignore[reportOptionalMemberAccess]
         "transactions": [t.model_dump(mode="json") for t in transactions],
     }
 
