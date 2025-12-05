@@ -24,7 +24,7 @@ class ActualAPI:
         r.raise_for_status()
         raw_balance = r.json()["data"]
         return Decimal(raw_balance / 100).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP
+            Decimal("0.01"), rounding=ROUND_HALF_UP,
         )
 
     def get_actual_open_accounts(self, budget_sync_id: str) -> list[Account]:
