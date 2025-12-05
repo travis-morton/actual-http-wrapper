@@ -24,7 +24,8 @@ class ActualAPI:
         r.raise_for_status()
         raw_balance = r.json()["data"]
         return Decimal(raw_balance / 100).quantize(
-            Decimal("0.01"), rounding=ROUND_HALF_UP,
+            Decimal("0.01"),
+            rounding=ROUND_HALF_UP,
         )
 
     def get_actual_open_accounts(self, budget_sync_id: str) -> list[Account]:
@@ -50,10 +51,7 @@ class ActualAPI:
             params["until_date"] = until_date.isoformat()
         response = self.session.get(url, params=params)
         response.raise_for_status()
-        return [
-            ExistingTransaction(**transaction)
-            for transaction in response.json()["data"]
-        ]
+        return [ExistingTransaction(**transaction) for transaction in response.json()["data"]]
 
     def import_transactions_to_actual(
         self,

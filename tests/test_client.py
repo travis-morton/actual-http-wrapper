@@ -95,7 +95,10 @@ def test_get_transactions_for_account_success(requests_mock: "Mocker"):
     requests_mock.get(url, json={"data": data})
 
     result = actual_api.get_transactions_for_account(
-        budget_id, account_id, since_date, until_date,
+        budget_id,
+        account_id,
+        since_date,
+        until_date,
     )
 
     assert result == [
