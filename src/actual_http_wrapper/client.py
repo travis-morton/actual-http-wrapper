@@ -19,6 +19,16 @@ class ActualAPI:
         r.raise_for_status()
         return Payee(**r.json()["data"])
 
+    def ensure_payee_exists(self, budget_sync_id: str, payee_name: str) -> Payee:
+        payees = self.get_payees_for_budget(budget_sync_id)
+        for payee in payees:
+            if payee.name == payee_name:
+                return payee
+        new_payee = Payee(name=payee_name)
+        created_payee = self.create_payee_for_budget(budget_sync_id, new_payee)
+        new_payee.id = created_payee.id
+        return new_payee
+
     def get_actual_accounts(self, budget_sync_id: str) -> list[Account]:
         url = f"{self.host}/budgets/{budget_sync_id}/accounts"
         r = self.session.get(url)
