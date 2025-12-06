@@ -194,7 +194,7 @@ def test_ensure_payee_exists_creates_new(requests_mock: "Mocker"):
 
     ensured_payee = actual_api.ensure_payee_exists(budget_id, payee_name)
 
-    assert ensured_payee == Payee(**response_data)
+    assert ensured_payee == Payee(name=payee_name, id="p456")
     assert requests_mock.last_request.json() == {  # pyright: ignore[reportOptionalMemberAccess]
         "payee": {"name": payee_name},
     }
