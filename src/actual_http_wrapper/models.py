@@ -21,6 +21,13 @@ class ExistingTransaction(BaseModel):
     notes: str | None
 
 
+class Payee(BaseModel):
+    id: str | None = None
+    name: str | None = None
+    category: str | None = None
+    transfer_acct: str | None = None
+
+
 class Transaction(BaseModel):
     account: str
     amount: int
