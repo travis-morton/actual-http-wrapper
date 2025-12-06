@@ -64,3 +64,9 @@ class ActualAPI:
         response = self.session.post(url, json=data)
         response.raise_for_status()
         return response
+
+    def trigger_all_bank_syncs(self, budget_sync_id: str) -> requests.Response:
+        url = f"{self.host}/budgets/{budget_sync_id}/accounts/banksync"
+        response = self.session.post(url)
+        response.raise_for_status()
+        return response

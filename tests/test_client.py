@@ -151,3 +151,14 @@ def test_get_account_balance(requests_mock: "Mocker"):
     balance = actual_api.get_account_balance(budget_id, account_id)
 
     assert balance == Decimal("123.45")
+
+
+def test_trigger_all_bank_syncs(requests_mock: "Mocker"):
+    actual_api = ActualAPI("http://example.com", "key")
+    budget_id = "budget1"
+    url = f"http://example.com/budgets/{budget_id}/accounts/banksync"
+    requests_mock.post(url, status_code=200)
+
+    response = actual_api.trigger_all_bank_syncs(budget_id)
+
+    assert response.status_code == HTTPStatus.OK
