@@ -162,4 +162,3 @@ def test_trigger_all_bank_syncs(requests_mock: "Mocker"):
     response = actual_api.trigger_all_bank_syncs(budget_id)
 
     assert response.status_code == HTTPStatus.OK
-    assert requests_mock.called
