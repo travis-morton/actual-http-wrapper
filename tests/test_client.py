@@ -4,7 +4,7 @@ from http import HTTPStatus
 from typing import TYPE_CHECKING
 
 from src.actual_http_wrapper.client import ActualAPI
-from src.actual_http_wrapper.models import Account, ExistingTransaction, Transaction
+from src.actual_http_wrapper.models import Account, ExistingTransaction, Payee, Transaction
 
 if TYPE_CHECKING:
     from requests_mock import Mocker
@@ -138,7 +138,7 @@ def test_get_payees_for_budget(requests_mock: "Mocker"):
 
     result = actual_api.get_payees_for_budget(budget_id)
 
-    assert result == payees
+    assert result == [Payee(**payee) for payee in payees]
 
 
 def test_get_account_balance(requests_mock: "Mocker"):
@@ -162,3 +162,20 @@ def test_trigger_all_bank_syncs(requests_mock: "Mocker"):
     response = actual_api.trigger_all_bank_syncs(budget_id)
 
     assert response.status_code == HTTPStatus.OK
+
+
+def test_create_payee_for_budget(requests_mock: "Mocker"):
+    actual_api = ActualAPI("http://example.com", "key")
+    budget_id = "budget1"
+    url = f"http://example.com/budgets/{budget_id}/payees"
+    payee = Payee(name="New Payee")
+    response_data = {"id": "p123"}
+    requests_mock.post(url, json={"data": response_data})
+
+    created_payee = actual_api.create_payee_for_budget(budget_id, payee)
+
+    assert created_payee == Payee(**response_data)
+    assert requests_mock.called
+    assert requests_mock.last_request.json() == {  # pyright: ignore[reportOptionalMemberAccess]
+        "payee": {"name": "New Payee"},
+    }

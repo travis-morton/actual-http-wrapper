@@ -3,7 +3,7 @@ from decimal import ROUND_HALF_UP, Decimal
 
 import requests
 
-from .models import Account, ExistingTransaction, Transaction
+from .models import Account, ExistingTransaction, Payee, Transaction
 
 
 class ActualAPI:
@@ -11,6 +11,13 @@ class ActualAPI:
         self.host = host
         self.session = requests.Session()
         self.session.headers.update({"x-api-key": api_key})
+
+    def create_payee_for_budget(self, budget_sync_id: str, payee: Payee) -> Payee:
+        url = f"{self.host}/budgets/{budget_sync_id}/payees"
+        data = {"payee": payee.model_dump(mode="json", exclude_none=True)}
+        r = self.session.post(url, json=data)
+        r.raise_for_status()
+        return Payee(**r.json()["data"])
 
     def get_actual_accounts(self, budget_sync_id: str) -> list[Account]:
         url = f"{self.host}/budgets/{budget_sync_id}/accounts"
@@ -32,11 +39,11 @@ class ActualAPI:
         accounts = self.get_actual_accounts(budget_sync_id)
         return [a for a in accounts if a.closed is False]
 
-    def get_payees_for_budget(self, budget_sync_id: str) -> list[dict]:
+    def get_payees_for_budget(self, budget_sync_id: str) -> list[Payee]:
         url = f"{self.host}/budgets/{budget_sync_id}/payees"
         response = self.session.get(url)
         response.raise_for_status()
-        return response.json()["data"]
+        return [Payee(**payee) for payee in response.json()["data"]]
 
     def get_transactions_for_account(
         self,
