@@ -1,6 +1,6 @@
 import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class Account(BaseModel):
@@ -36,3 +36,4 @@ class Transaction(BaseModel):
     cleared: bool
     imported_id: str
     notes: str | None = None
+    category: str | None = Field(default=None, description="Category ID")
